@@ -3,7 +3,8 @@
 global.console.log('Yay'); // = OK
 console.log('YAY2')// = Also OK and equivalent to the above.
 
-//Also variables defined "globaly" in a file does not get added to the global scope. It is instead restricted to this file
+//Also variables defined "globaly" in a file does not get added to the global scope.
+//It is private to this file
 var message = ""
 console.log(global.message); //=> Prints undefined
 

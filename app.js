@@ -1,3 +1,2 @@
-var osModuleTestMain = require('./osModule');
-
-osModuleTestMain();
+var main = require('./fileSystem');
+main();
