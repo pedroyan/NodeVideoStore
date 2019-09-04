@@ -4,6 +4,15 @@ const app = express();
 
 app.use(express.json());
 
+const port = process.env.NODEPORT || 3000;
+
+const courses = [
+    { id: 1, name: 'coursename' },
+    { id: 2, name: 'coursename 2' },
+    { id: 3, name: 'coursename 3' },
+    { id: 4, name: 'coursename 4' },
+]
+
 function validateCourse(course) {
     const courseSchema = {
         name: Joi.string().min(3).required()
@@ -12,17 +21,9 @@ function validateCourse(course) {
     return Joi.validate(course, courseSchema);
 }
 
-const port = process.env.NODEPORT || 3000;
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
 });
-
-const courses = [
-    { id: 1, name: 'coursename' },
-    { id: 2, name: 'coursename 2' },
-    { id: 3, name: 'coursename 3' },
-    { id: 4, name: 'coursename 4' },
-]
 
 app.get('/', (req, res) => {
     res.send('Hello World!!!');
