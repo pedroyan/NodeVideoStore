@@ -1,3 +1,3 @@
-var fileModule = require('./fileModuleExample');
-fileModule.run();
+var osModuleTestMain = require('./osModule');
 
+osModuleTestMain();

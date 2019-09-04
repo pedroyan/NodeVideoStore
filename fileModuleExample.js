@@ -1,7 +1,9 @@
-require('path');
+const path = require('path');
 
 function run(){
-    console.log('File module is up and runniing baby')
+    var pathObject = path.parse(__filename);
+    console.log(pathObject);
+    console.log(pathObject.base);
 }
 
 module.exports.run = run;
