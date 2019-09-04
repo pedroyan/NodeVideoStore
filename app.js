@@ -1,9 +1,8 @@
-const EventEmmitter = require('events');
-const log = require('./logger');
+const Logger = require('./logger');
+const loggerInstance = new Logger();
 
-const emmitter = new EventEmmitter();
-emmitter.on('messageLogged', arg => {
-    console.log('Event handler received payload', arg);
+loggerInstance.on('messageLogged', arg => {
+    console.log('App.js handler reached!', arg);
 })
 
-log('Something to log');
+loggerInstance.log('Something to log')
