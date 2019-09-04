@@ -9,3 +9,7 @@ function log(message){
 }
 
 module.exports = log;
+
+//To run this type of exports:
+// const log = require('./logger');
+// log('My message');
