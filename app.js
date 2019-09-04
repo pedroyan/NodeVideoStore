@@ -1,8 +1,17 @@
-const Logger = require('./logger');
-const loggerInstance = new Logger();
+const http = require('http');
 
-loggerInstance.on('messageLogged', arg => {
-    console.log('App.js handler reached!', arg);
-})
+const server = http.createServer((req, res) => {
+    if (req.url === '/') {
+        res.write('Hello network world');
+        res.end();
+    }
 
-loggerInstance.log('Something to log')
+    if(req.url == '/api/courses'){
+        res.write(JSON.stringify([1,2,3,4,5,6]));
+        res.end();
+    }
+});
+
+server.listen(3000);
+
+console.log('Listening on port 3000...');
