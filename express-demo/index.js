@@ -1,10 +1,20 @@
 const Joi = require('joi');
 const express = require('express');
+const logger = require('./logger')
+const authenticator = require('./authenticator');
+
 const app = express();
 
+//NOTE: The inclusion order of the middlewares matter
 app.use(express.json());
 
+app.use(logger);
+app.use(authenticator);
+
 const port = process.env.NODEPORT || 3000;
+app.listen(port, () => {
+    console.log(`App listening on port ${port}`);
+});
 
 const courses = [
     { id: 1, name: 'coursename' },
@@ -13,20 +23,8 @@ const courses = [
     { id: 4, name: 'coursename 4' },
 ]
 
-function validateCourse(course) {
-    const courseSchema = {
-        name: Joi.string().min(3).required()
-    };
-
-    return Joi.validate(course, courseSchema);
-}
-
-app.listen(port, () => {
-    console.log(`App listening on port ${port}`);
-});
-
 app.get('/', (req, res) => {
-    res.send('Hello World!!!');
+    res.send('Hello World');
 });
 
 app.get('/api/courses', (req, res) => {
@@ -84,3 +82,11 @@ app.delete('/api/courses/:id', (req,res) => {
 
     res.send(course);
 });
+
+function validateCourse(course) {
+    const courseSchema = {
+        name: Joi.string().min(3).required()
+    };
+
+    return Joi.validate(course, courseSchema);
+}
