@@ -1,15 +1,30 @@
+const config = require('config');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const Joi = require('joi');
 const express = require('express');
 const logger = require('./logger')
 const authenticator = require('./authenticator');
 
-const app = express();
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`Application name: ${config.get('name')}`);
+console.log(`Mail Server: ${config.get('mail.host')}`);
+console.log(`Mail Server Password: ${config.get('mail.password')}`);
+
 
 //NOTE: The inclusion order of the middlewares matter
+const app = express();
 app.use(express.json());
-
-app.use(logger);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public')); //Serves files statically
+app.use(helmet());
+if (app.get('env') === 'development'){
+    console.log('Morgan enabled...')
+    app.use(morgan('tiny'));
+}
 app.use(authenticator);
+
+
 
 const port = process.env.NODEPORT || 3000;
 app.listen(port, () => {
@@ -73,7 +88,7 @@ app.put('/api/courses/:id', (req, res) => {
     res.send(toUpdate);
 });
 
-app.delete('/api/courses/:id', (req,res) => {
+app.delete('/api/courses/:id', (req, res) => {
     let course = courses.find(c => c.id === parseInt(req.params.id));
     if (!course) return res.status(404).send(`Could not find any course with id ${req.params.id}`);
 
