@@ -5,32 +5,29 @@ const Joi = require('joi');
 const express = require('express');
 const logger = require('./logger')
 const authenticator = require('./authenticator');
+const hbs = require('express-handlebars');
+const app = express();
 
-console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-console.log(`Application name: ${config.get('name')}`);
-console.log(`Mail Server: ${config.get('mail.host')}`);
-console.log(`Mail Server Password: ${config.get('mail.password')}`);
-
+//Watch this great tutorial if you wanna learn more about handlebars:
+//https://www.youtube.com/watch?v=1srD3Mdvf50
+app.engine('hbs', hbs({extname: 'hbs'}));
+app.set('view engine', 'hbs');
 
 //NOTE: The inclusion order of the middlewares matter
-const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public')); //Serves files statically
 app.use(helmet());
 if (app.get('env') === 'development'){
-    console.log('Morgan enabled...')
     app.use(morgan('tiny'));
+    console.log('Morgan enabled...')
 }
 app.use(authenticator);
-
-
 
 const port = process.env.NODEPORT || 3000;
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
 });
-
 const courses = [
     { id: 1, name: 'coursename' },
     { id: 2, name: 'coursename 2' },
@@ -39,7 +36,7 @@ const courses = [
 ]
 
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.render('index', {title: "Custom Title", message: "my message here"});
 });
 
 app.get('/api/courses', (req, res) => {

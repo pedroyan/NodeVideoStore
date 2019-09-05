@@ -1,7 +1,5 @@
 {
-    "name": "Express Demo - PRODUCTION",
     "mail":{
-        "host": "prod-mail-server",
-        "password": "express-demo_password"
+        "password": "express_demo_password"
     }
 }
