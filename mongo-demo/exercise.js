@@ -40,15 +40,15 @@ async function Exercise2() {
 
     //My solution using OR
     // return await Course
-    //     .find()
+    //     .find({isPublished: true})
     //     .or([{tags: 'backend'}, {tags: 'frontend'}])
     //     .sort({ price: -1 })
     //     .select({ name: 1, author: 1 });
 
-    //Cleaner soluton using in
+    //Cleaner soluton using in and string syntax
     return await Course
-        .find({tags: { $in: ['frontend', 'backend'] }})
-        .sort({ price: -1 })
-        .select({ name: 1, author: 1 });
+        .find({isPublished:true, tags: { $in: ['frontend', 'backend'] }})
+        .sort('-price')
+        .select('name author price');
 }
 
