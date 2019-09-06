@@ -8,7 +8,7 @@ const courseSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minLenght: 5,
+        minLength: 5,
         maxlength: 255,
         //match: /regex/
     },
@@ -18,7 +18,15 @@ const courseSchema = new mongoose.Schema({
         enum: ['web', 'mobile', 'pc', 'gaming']
     },
     author: String,
-    tags: [String],
+    tags: {
+        type: Array,
+        validate: {
+            validator: function(v){
+                return v && v.length > 0;
+            },
+            message: 'A course should have at least one tag'
+        }
+    },
     date: { type: Date, default: Date.now },
     isPublished: Boolean,
     price: {
@@ -35,10 +43,10 @@ const Course = mongoose.model('Course', courseSchema);
 async function createCourse() {
     //Creates the course instance
     const course = new Course({
-        // name: 'Mastering the .NET Framework',
+        name: 'Mastering the .NET Framework',
         author: 'Pedro',
-        tags: ['.NET', 'Backend'],
-        category: 'pc',
+        //tags: ['backend', '.NET'],
+        category: 'web',
         isPublished: true,
         price: 50
     });
