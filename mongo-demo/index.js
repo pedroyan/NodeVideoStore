@@ -114,4 +114,36 @@ async function updateCourseViaQueryFirst(id){
     console.log(response);
 }
 
-updateCourseViaQueryFirst('5a68fdf95db93f6477053ddd');
+async function updateCourseViaUpdateFirst(id){
+    //https://docs.mongodb.com/manual/reference/operator/update/
+
+    //retuns the update result object.
+    // const result = await Course.updateOne({_id: id}, {
+    //     $set: {
+    //         author: 'Mosh',
+    //         isPublished: false 
+    //     }
+    // });
+    // console.log(result); 
+
+
+    //Returns a course object
+    const course = await Course.findOneAndUpdate(id, {
+        $set: {
+            author: 'Mosh',
+            isPublished: true 
+        }
+    }, {new: true});
+
+    console.log(course);
+}
+
+async function removeCourse(id){
+    const result = await Course.deleteOne({_id: id});
+    //const result = await Course.deleteMany({isPublished: false});
+    //const course = await Course.findByIdAndDelete(id);
+    console.log(result);
+}
+
+
+removeCourse('5a68fdf95db93f6477053ddd');
