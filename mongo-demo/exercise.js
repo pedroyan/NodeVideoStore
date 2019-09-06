@@ -17,7 +17,7 @@ const courseSchema = new mongoose.Schema({
 //Creates the Course class
 const Course = mongoose.model('Course', courseSchema);
 
-Exercise2()
+Exercise3()
     .then(r => console.log(r))
     .catch(err => console.log('Error occurred', err));
 
@@ -47,8 +47,18 @@ async function Exercise2() {
 
     //Cleaner soluton using in and string syntax
     return await Course
-        .find({isPublished:true, tags: { $in: ['frontend', 'backend'] }})
+        .find({ isPublished: true, tags: { $in: ['frontend', 'backend'] } })
         .sort('-price')
+        .select('name author price');
+}
+
+async function Exercise3() {
+    //Get all published courses that are $15 or more,
+    //or have the word by in their title
+
+    return await Course
+        .find({ isPublished: true})
+        .or([{price: { $gte: 15 }}, {name: /.*by.*/i }])
         .select('name author price');
 }
 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/playground')
+mongoose.connect('mongodb://localhost/mongo-exercises', {useNewUrlParser: true})
     .then(() => console.log('Connected to MongoDb...'))
     .catch(err => console.log('Could not connect to MongoDB', err));
 
@@ -16,7 +16,6 @@ const courseSchema = new mongoose.Schema({
 
 //Creates the Course class
 const Course = mongoose.model('Course', courseSchema);
-
 async function createCourse() {
     //Creates the course instance
     const nodeCourse = new Course({
@@ -30,12 +29,6 @@ async function createCourse() {
     const result = await nodeCourse.save();
     console.log('Saved new course', result._id);
 }
-
-//createCourse();
-//getCourses();
-//getFilteredCourses();
-getPaginatedCourses()
-
 async function getCourses() {
     const courses = await Course.find();
     console.log('Listing all courses: ', courses);
@@ -59,7 +52,7 @@ async function getFilteredCourses() {
     const queried = await Course
         //.find({price: 15, author: 'Pedro'})               //I want a course with the price of 15 dollars made by Pedro
         //.find({price: {$lt: 19, $gt:6}})                  //I want courses with their prices between 19 and 6 dollars
-        //.find({ price: { $in: [15, 8, 5] } })             //I want courses where their prices match any of the entered values7
+        //.find({ price: { $in: [15, 8, 5] } })             //I want courses where their prices match any of the entered values
         .find()
         .or([{ isPublished: true }, { author: 'Pedro Yan' }])
         .and({ price: { $gt: 10 } })                            //SQL Equivalent: where (isPublished = true || author: 'Pedro') && price > 10
@@ -69,9 +62,6 @@ async function getFilteredCourses() {
     //.count(); //Get only the number of results in the query
 
     console.log('Queried courses', queried);
-
-    //getRegexedCourses
-    //getPaginatedCourses
 }
 
 async function getRegexedCourses() {
@@ -102,7 +92,26 @@ async function getPaginatedCourses() {
     console.log('Queried courses', queried);
 }
 
+async function updateCourseViaQueryFirst(id){
+    const course = await Course.findById(id);
+    let again = await Course.find();
+    if (!course) {
+        console.log('No course could be found', course);
+        console.log('All couses', again);
+        return;
+    }
 
+    //Equivalent to the code below
+    // course.isPublished = true;
+    // course.author = 'Update Author';
 
+    course.set({
+        isPublished: true,
+        author: 'Update Author'
+    })
 
+    const response = await course.save()
+    console.log(response);
+}
 
+updateCourseViaQueryFirst('5a68fdf95db93f6477053ddd');
