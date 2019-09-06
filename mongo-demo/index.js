@@ -1,33 +1,55 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/mongo-exercises', {useNewUrlParser: true})
+mongoose.connect('mongodb://localhost/mongo-exercises', { useNewUrlParser: true })
     .then(() => console.log('Connected to MongoDb...'))
     .catch(err => console.log('Could not connect to MongoDB', err));
 
-//Defines the course schema
 const courseSchema = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        required: true,
+        minLenght: 5,
+        maxlength: 255,
+        //match: /regex/
+    },
+    category: {
+        type: String,
+        required: true,
+        enum: ['web', 'mobile', 'pc', 'gaming']
+    },
     author: String,
     tags: [String],
     date: { type: Date, default: Date.now },
     isPublished: Boolean,
-    price: Number,
+    price: {
+        type: Number,
+        required: function () { return this.isPublished; },
+        min: 10,
+        max: 200
+    },
 });
 
 //Creates the Course class
 const Course = mongoose.model('Course', courseSchema);
+
 async function createCourse() {
     //Creates the course instance
-    const nodeCourse = new Course({
-        name: 'C# Course',
+    const course = new Course({
+        // name: 'Mastering the .NET Framework',
         author: 'Pedro',
         tags: ['.NET', 'Backend'],
-        isPublished: false,
+        category: 'pc',
+        isPublished: true,
         price: 50
     });
 
-    const result = await nodeCourse.save();
-    console.log('Saved new course', result._id);
+    try {
+        await course.validate()
+        const result = await course.save();
+        console.log('Saved new course', result._id);
+    } catch (err) {
+        console.log('An error ocurred while saving the course', err);
+    }
 }
 async function getCourses() {
     const courses = await Course.find();
@@ -92,7 +114,7 @@ async function getPaginatedCourses() {
     console.log('Queried courses', queried);
 }
 
-async function updateCourseViaQueryFirst(id){
+async function updateCourseViaQueryFirst(id) {
     const course = await Course.findById(id);
     let again = await Course.find();
     if (!course) {
@@ -114,7 +136,7 @@ async function updateCourseViaQueryFirst(id){
     console.log(response);
 }
 
-async function updateCourseViaUpdateFirst(id){
+async function updateCourseViaUpdateFirst(id) {
     //https://docs.mongodb.com/manual/reference/operator/update/
 
     //retuns the update result object.
@@ -131,19 +153,19 @@ async function updateCourseViaUpdateFirst(id){
     const course = await Course.findOneAndUpdate(id, {
         $set: {
             author: 'Mosh',
-            isPublished: true 
+            isPublished: true
         }
-    }, {new: true});
+    }, { new: true });
 
     console.log(course);
 }
 
-async function removeCourse(id){
-    const result = await Course.deleteOne({_id: id});
+async function removeCourse(id) {
+    const result = await Course.deleteOne({ _id: id });
     //const result = await Course.deleteMany({isPublished: false});
     //const course = await Course.findByIdAndDelete(id);
     console.log(result);
 }
 
 
-removeCourse('5a68fdf95db93f6477053ddd');
+createCourse();
