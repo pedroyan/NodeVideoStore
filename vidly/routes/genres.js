@@ -1,8 +1,9 @@
 const Joi = require('joi');
 const express = require('express');
-const debug = require('debug')('app:genres');
-const router = express.Router();
 const mongoose = require('mongoose');
+const debug = require('debug')('app:genres');
+
+const router = express.Router();
 
 const Genre = mongoose.model('Genre', new mongoose.Schema({
     name: {
@@ -23,12 +24,12 @@ router.get('/', async (req, res) => {
 
 //Get specific genre
 router.get('/:id', async (req, res) => {
-    try{
+    try {
         const genre = await Genre.findById(req.params.id);
         if (!genre) return res.status(404).send(`Could not find any genre with the id ${req.params.id}`);
-    
+
         return res.send(genre);
-    }catch(err){
+    } catch (err) {
         debug(`An erro ocurred while looking for specific genre ${req.params.id}`, err)
     }
 });
