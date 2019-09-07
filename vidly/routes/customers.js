@@ -1,33 +1,8 @@
-const Joi = require('joi');
 const express = require('express')
-const mongoose = require('mongoose');
 const debug = require('debug')('app:customers')
+const {Customer, validate} = require('../models/customers');
 
 const router = express.Router();
-
-const Customer = mongoose.model('Customer', new mongoose.Schema({
-    isGold: {
-        type: Boolean,
-        required: true
-    },
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    phone: {
-        type: String,
-        required: true,
-        minlength: 5,
-        match: /^(\+)?[0-9]+$/
-    }
-}));
-
-const customerJoiSchema = {
-    name: Joi.string().required(),
-    isGold: Joi.boolean(),
-    phone: Joi.string().regex(/^(\+)?[0-9]+$/).min(5).required()
-};
 
 router.get('/', async (req, res) => {
     try {
@@ -46,7 +21,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) =>{
-    const { error } = Joi.validate(req.body, customerJoiSchema)
+    const { error } = validate(req.body)
     if (error) return res.status(400).send(error.details[0].message);
 
     const newCustomer = new Customer(parseCustomer(req.body));
@@ -61,7 +36,7 @@ router.post('/', async (req, res) =>{
 });
 
 router.put('/:id', async (req, res) => {
-    const { error } = Joi.validate(req.body, customerJoiSchema)
+    const { error } = validate(req.body)
     if (error) return res.status(400).send(error.details[0].message);
 
     if (!req.params.id) return res.status(404).send(`An ID must be provided to update a customer`);
@@ -86,4 +61,3 @@ function parseCustomer(requestBody){
 
 
 module.exports = router;
-
