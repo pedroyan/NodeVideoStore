@@ -25,7 +25,7 @@ const Movie = mongoose.model('Movie', new mongoose.Schema({
 
 const movieJoiSchema = {
     title: Joi.string().required(),
-    genreId: Joi.strict().required(), //ID to genre
+    genreId: Joi.string().required(), //ID to genre
     numberInStock: Joi.number(),
     dailyRentalRate: Joi.number()
 }
