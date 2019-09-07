@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const express = require('express')
 const mongoose = require('mongoose');
+const debug = require('debug')('app:customers')
 
 const router = express.Router();
 
@@ -28,6 +29,22 @@ const customerJoiSchema = {
     phone: Joi.string().regex(/^(\+)?[0-9]+$/).min(5).required()
 };
 
+router.get('/', async (req, res) => {
+    try {
+        res.send(await Customer.find());
+    } catch (error) {
+        debug('An error occurred while retrieving the customer list', error)
+    }
+});
+
+router.get('/:id', async (req, res) => {
+    try {
+        res.send(await Customer.findById(req.params.id));
+    } catch (error) {
+        debug(`An error occurred while retrieving the custumer ${req.params.id}`, error)
+    }
+});
+
 router.post('/', async (req, res) =>{
     const { error } = Joi.validate(req.body, customerJoiSchema)
     if (error) return res.status(400).send(error.details[0].message);
@@ -38,7 +55,7 @@ router.post('/', async (req, res) =>{
         const result = await newCustomer.save();
         res.send(result);
     } catch (error) {
-        debug('An error ocurred while saving the customer', error);
+        debug('An error occurred while saving the customer', error);
         res.send('Could not save customer to database');
     }
 });
