@@ -10,6 +10,8 @@ const Author = mongoose.model('Author', new mongoose.Schema({
   website: String
 }));
 
+//Relationship via references prioritizes consistency, but has a perfomance penalty because 2 queries
+//need to be done in order to get the entire document
 const Course = mongoose.model('Course', new mongoose.Schema({
   name: String,
   author: {
