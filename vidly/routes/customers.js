@@ -50,6 +50,16 @@ router.put('/:id', async (req, res) => {
     res.send(customer);
 });
 
+router.delete('/:id', async (req, res) => {
+    if (!req.params.id) return res.status(404).send(`An ID must be provided to update a customer`);
+
+    const customer = await Customer.findByIdAndDelete(req.params.id);
+
+    if (!customer) return res.status(404).send(`Could not find any customer with the id ${req.params.id}`);
+    
+    res.send(customer);
+})
+
 function parseCustomer(requestBody){
     const isGold = requestBody.isGold === 'false'? false : Boolean(requestBody.isGold)
     return {
