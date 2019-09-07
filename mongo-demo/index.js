@@ -168,7 +168,7 @@ async function updateCourseViaUpdateFirst(id) {
 
 
     //Returns a course object
-    const course = await Course.findOneAndUpdate(id, {
+    const course = await Course.findByIdAndUpdate(id, {
         $set: {
             author: 'Mosh',
             isPublished: true
