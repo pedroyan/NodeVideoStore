@@ -6,6 +6,8 @@ const Movie = mongoose.model('Movie', new mongoose.Schema({
     title:{
         type: String,
         required: true,
+        trim: true,
+        maxlength: 255
     },
     genre:{
         type: genres.schema,
