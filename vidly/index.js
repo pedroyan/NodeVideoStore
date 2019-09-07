@@ -2,8 +2,10 @@ const express = require('express');
 const debug = require('debug')('app:startup');
 const mongoose = require('mongoose');
 
+//Routes
 const genres = require('./routes/genres');
 const customers = require('./routes/customers');
+const movies = require('./routes/movies');
 
 mongoose.connect('mongodb://localhost/vidly', { useNewUrlParser: true, useFindAndModify: false})
     .then(() => debug('Connected to the database...'))
@@ -11,8 +13,10 @@ mongoose.connect('mongodb://localhost/vidly', { useNewUrlParser: true, useFindAn
 
 const app = express();
 app.use(express.json()); //Parse requests as JSON
+
 app.use('/api/genres', genres);
 app.use('/api/customers', customers);
+app.use('/api/movies', movies);
 
 const port = process.env.NODEPORT || 7345;
 app.listen(port, () => {

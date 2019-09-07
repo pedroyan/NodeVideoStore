@@ -23,7 +23,7 @@ const Movie = mongoose.model('Movie', new mongoose.Schema({
 
 const movieJoiSchema = {
     title: Joi.string().required(),
-    genre: Joi.object().required(),
+    genreId: Joi.strict().required(), //ID to genre
     numberInStock: Joi.number(),
     dailyRentalRate: Joi.number()
 }
