@@ -15,10 +15,7 @@ const Author = mongoose.model('Author', authorSchema);
 //Systems that opt for using this way need to embrace eventual consistency to its core
 const Course = mongoose.model('Course', new mongoose.Schema({
   name: String,
-  author: {
-    type: authorSchema,
-    required: true
-  }
+  authors: [authorSchema]
 }));
 
 async function createAuthor(name, bio, website) {
@@ -32,10 +29,10 @@ async function createAuthor(name, bio, website) {
   console.log(result);
 }
 
-async function createCourse(name, author) {
+async function createCourse(name, authors) {
   const course = new Course({
     name,
-    author
+    authors
   });
 
   const result = await course.save();
@@ -50,26 +47,19 @@ async function listCourses() {
   console.log(courses);
 }
 
-async function updateAuthor(courseId, newName) {
-  const course = await Course.updateOne({ _id: courseId }, {
-    $set:{
-      'author.name': newName
-    }
-  });
-
-  //Removes the subdocument
-  // const course = await Course.updateOne({ _id: courseId }, {
-  //   $unset:{
-  //     'author': ''
-  //   }
-  // });
+async function addAuthor(courseId, author){
+  const course = await Course.findById(courseId);
+  course.authors.push(author);
+  course.save();
   console.log(course);
 }
 
-//createAuthor('Mosh', 'My bio', 'My Website');
+async function removeAuthor(courseId, authorId){
+  const course = await Course.findById(courseId);
+  const author = course.authors.id(authorId)  
+  author.remove();
+  course.save();
+  console.log(course);
+}
 
-//createCourse('Node Course', new Author({ name: 'Mosh' }));
-
-//listCourses();
-
-updateAuthor('5d740c06d078ae77786718ec', 'Pedro Yan')
+removeAuthor('5d740fa3c6970341d8502c52', '5d740fa3c6970341d8502c4f');
