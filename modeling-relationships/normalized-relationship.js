@@ -10,8 +10,12 @@ const Author = mongoose.model('Author', new mongoose.Schema({
   website: String
 }));
 
-//Relationship via references prioritizes consistency, but has a perfomance penalty because 2 queries
-//need to be done in order to get the entire document
+/**Referencing documents (normalization) is a good approach when you want to enforce 
+ * data consistency. Because there will be a single instance of an object in the 
+ * database. But this approach has a negative impact on the performance of your 
+ * queries because in MongoDB we cannot JOIN documents as we do in relational 
+ * databases. So, to get a complete representation of a document with its related 
+ * documents, we need to send multiple queries to the database. */
 const Course = mongoose.model('Course', new mongoose.Schema({
   name: String,
   author: {
@@ -44,7 +48,7 @@ async function createCourse(name, author) {
 async function listCourses() { 
   const courses = await Course
     .find()
-    .populate('author', 'name -_id bio')
+    .populate('author', 'name -_id bio') //Under the hood, this represents a second query.
     .select('name author');
   console.log(courses);
 }

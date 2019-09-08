@@ -11,8 +11,16 @@ const authorSchema = new mongoose.Schema({
 });
 const Author = mongoose.model('Author', authorSchema);
 
-//Relationship via Embedded documents prioritize performance, but ends up resulting on eventual consistency.
-//Systems that opt for using this way need to embrace eventual consistency to its core
+/**Embedding documents (denormalization) solves this issue. We can read a complete
+ * representation of a document with a single query. All the necessary data is
+ * embedded in one document and its children. But this also means we’ll have multiple
+ * copies of data in different places. While storage is not an issue these days,
+ * having multiple copies means changes made to the original document may not propagate
+ * to all copies. If the database server dies during an update, some documents will be
+ * inconsistent. For every business, for every problem, you need to ask this question:
+ * “can we tolerate data being inconsistent for a short period of time?” If not, you’ll
+ * have to use references. But again, this means that your queries will be slower. 
+ */
 const Course = mongoose.model('Course', new mongoose.Schema({
   name: String,
   authors: [authorSchema]
