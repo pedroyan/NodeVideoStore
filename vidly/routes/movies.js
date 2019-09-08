@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
 
     const genre = await Genre.findById(req.body.genreId);
-    if (!genre) return res.status(400).send(`Could not find a Genre with ID ${req.body.genreId}`)
+    if (!genre) return res.status(400).send(`Could not find a Genre with ID ${req.body.genreId}`);
 
     var movie = new Movie({
         title: req.body.title,
@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     const movie = await Movie.findById(req.params.id);
-    if (!movie) return res.status(400).send(`Could not find a Genre with ID ${req.body.genreId}`)
+    if (!movie) return res.status(400).send(`Could not find a Movie with ID ${req.body.genreId}`)
 
     res.send(movie);
 });
@@ -40,8 +40,6 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     const { error } = validate(req.body)
     if (error) return res.status(400).send(error.details[0].message);
-
-    if (!req.params.id) return res.status(404).send(`An ID must be provided to update a movie`);
 
     const genre = await Genre.findById(req.body.genreId);
     if (!genre) return res.status(400).send(`Could not find a Genre with ID ${req.body.genreId}`)

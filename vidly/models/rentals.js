@@ -6,7 +6,9 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
     //Because on a real world application, this is the only information about a
     //customer that matters to the Rental. By doing it like this, we garantee
     //that if the customer schema grows to 50 properties, only the ones that 
-    //matter will be included in the nested document
+    //matter will be included in the nested document. Updating this afterwards
+    //whenever the client updates must be a pain in the ass... lets keep 
+    //studying to find out.
     customer: {
         type: new mongoose.Schema({ 
             isGold: {
@@ -27,7 +29,7 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
         }),
         required: true
     },
-    //Tha same gos for the movie property
+    //Tha same goes for the movie property
     movie:{
         type: new mongoose.Schema({
             title:{
@@ -50,8 +52,11 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
     returnDate:{
         type: Date,
         required: true,
-        validate: function(v){
-            return v > this.rentalDate;
+        validate:{
+            validator:  function(v){
+                return v > this.rentalDate;
+            },
+            message: 'The return date must come after the rental date'
         }
     }
 }));
@@ -59,7 +64,8 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
 const rentalJoiSchema = {
     customerId: Joi.string().required(),
     movieId: Joi.string().required(), //ID to genre
-    returnDate: Joi.date().required()
+    returnDate: Joi.date().required(),
+    rentalDate: Joi.date()
 };
 
 function validate(rentalRequest){
