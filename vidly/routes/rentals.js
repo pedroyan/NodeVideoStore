@@ -43,6 +43,7 @@ router.post('/', async (req, res) => {
 
         res.send(rental);
     } catch (err) {
+        debug('An unexpected error occurred while creating a rental', err);
         res.status(500).send('Something Failed');
     }
 })

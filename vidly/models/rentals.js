@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 
 const Rental = mongoose.model('Rental', new mongoose.Schema({
     //Why I didn't copy the customer schema directly from the customer module?
@@ -62,8 +63,8 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
 }));
 
 const rentalJoiSchema = {
-    customerId: Joi.string().required(),
-    movieId: Joi.string().required(), //ID to genre
+    customerId: Joi.objectId().required(),
+    movieId: Joi.objectId().required(), //ID to genre
     returnDate: Joi.date().required(),
     rentalDate: Joi.date()
 };
