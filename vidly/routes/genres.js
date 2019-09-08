@@ -1,3 +1,4 @@
+const asyncMiddleware = require('../middleware/async');
 const express = require('express');
 const {Genre, validate} = require('../models/genres');
 const debug = require('debug')('app:genres');
@@ -7,20 +8,17 @@ const admin = require('../middleware/admin')
 const router = express.Router();
 
 //Get all genres
-router.get('/', async (req, res) => {
+router.get('/', asyncMiddleware(async (req, res) => {
+    throw new Error('lol');
     res.send(await Genre.find().sort('name'));
-});
+}));
 
 //Get specific genre
 router.get('/:id', async (req, res) => {
-    try {
-        const genre = await Genre.findById(req.params.id);
-        if (!genre) return res.status(404).send(`Could not find any genre with the id ${req.params.id}`);
+    const genre = await Genre.findById(req.params.id);
+    if (!genre) return res.status(404).send(`Could not find any genre with the id ${req.params.id}`);
 
-        return res.send(genre);
-    } catch (err) {
-        debug(`An erro ocurred while looking for specific genre ${req.params.id}`, err)
-    }
+    return res.send(genre);
 });
 
 //Create a Genre

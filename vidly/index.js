@@ -4,6 +4,7 @@ Joi.objectId = require('joi-objectid')(Joi);
 const express = require('express');
 const debug = require('debug')('app:startup');
 const mongoose = require('mongoose');
+const error = require('./middleware/error');
 
 //Routes
 const genres = require('./routes/genres');
@@ -31,6 +32,7 @@ app.use('/api/movies', movies);
 app.use('/api/rentals', rentals);
 app.use('/api/users', users);
 app.use('/api/auth', auth);
+app.use(error);
 
 const port = process.env.NODEPORT || 7345;
 app.listen(port, () => {
