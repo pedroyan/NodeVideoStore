@@ -2,7 +2,11 @@ const express = require('express');
 const { Rental, validate } = require('../models/rentals');
 const { Customer } = require('../models/customers');
 const { Movie } = require('../models/movies');
+const mongoose = require('mongoose');
+const Fawn = require('fawn');
 const debug = require('debug')('app:rentals');
+
+Fawn.init(mongoose);
 
 const router = express.Router();
 
@@ -25,17 +29,21 @@ router.post('/', async (req, res) => {
     });
 
     try {
-        await rental.save();
+        //In MongoDB, there is no such thing as a Transaction, like in SQL.
+        //But there is a concept called two phase commit:
+        //https://docs.mongodb.com/v3.4/tutorial/perform-two-phase-commits/
 
-        movie.numberInStock--;
-        movie.save();
+        //In this project, we will be using an NPM package that abstracts this two phase
+        //commit to something akin to a transaxtion, as shown below.
+        new Fawn.Task()
+        .save('rentals', rental)
+        .update('movies', {_id: movie._id}, {
+            $inc: {numberInStock: -1}
+        }).run();
 
-        return res.send(rental);
+        res.send(rental);
     } catch (err) {
-        for (const error in err.errors) {
-            debug('Could not save rental to database: ', err.errors[error].message);
-        }
-        return res.send('Could not save rental to database');
+        res.status(500).send('Something Failed');
     }
 })
 
