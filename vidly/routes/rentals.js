@@ -16,6 +16,8 @@ router.post('/', async (req, res) => {
     const movie = await Movie.findById(req.body.movieId);
     if (!movie) return res.status(400).send(`Could not find a Movie with ID ${req.body.genreId}`);
 
+    if (movie.numberInStock === 0) return res.status(400).send(`Movie not available`);
+    
     const rental = new Rental({
         customer: customer, //Only the schema defined properties will be passed along
         movie: movie,
@@ -24,6 +26,10 @@ router.post('/', async (req, res) => {
 
     try {
         await rental.save();
+
+        movie.numberInStock--;
+        movie.save();
+
         return res.send(rental);
     } catch (err) {
         for (const error in err.errors) {
