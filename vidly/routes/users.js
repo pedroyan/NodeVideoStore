@@ -1,5 +1,3 @@
-const jwt = require('jsonwebtoken');
-const config = require('config');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const _ = require('lodash');
@@ -28,8 +26,7 @@ router.post('/', async (req, res) => {
         await user.save();
 
         //Builds a new model containing only the name and email property
-        const token = jwt.sign({ _id: user._id }, config.get('jwtPrivateKey'));
-        return res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']));
+        return res.header('x-auth-token', user.generateAuthToken()).send(_.pick(user, ['_id', 'name', 'email']));
     } catch (error) {
         debug('An unexpected error ocurred while trying to create user on the DB', error);
         return res.status(500).send('Could not create user');
