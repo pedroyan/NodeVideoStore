@@ -5,12 +5,13 @@ const { Movie } = require('../models/movies');
 const mongoose = require('mongoose');
 const Fawn = require('fawn');
 const debug = require('debug')('app:rentals');
+const authMiddleware = require('../middleware/auth');
 
 Fawn.init(mongoose);
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -59,7 +60,7 @@ router.get('/:id', async (req, res) => {
     res.send(rental);
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     const { error } = validate(req.body)
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -92,7 +93,7 @@ router.put('/:id', async (req, res) => {
 });
 
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     const rental = await Rental.findByIdAndDelete(req.params.id);
     if (!rental) return res.status(400).send(`Could not find a rental with ID ${req.params.id}`)
     res.send(rental);

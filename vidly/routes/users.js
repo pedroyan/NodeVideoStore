@@ -4,6 +4,7 @@ const _ = require('lodash');
 const router = express.Router();
 const { User, validate } = require('../models/user');
 const debug = require('debug')('app:users');
+const authMiddleware = require('../middleware/auth');
 
 // Authentication
 // Authorization
@@ -11,8 +12,7 @@ const debug = require('debug')('app:users');
 // Register: POST /api/user {name, email, password}. Email must be unique -> { email: {type: String, unique:true}}
 // Login: POST /api/logins
 
-
-router.post('/', async (req, res) => {
+router.post('/',  authMiddleware, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -31,6 +31,13 @@ router.post('/', async (req, res) => {
         debug('An unexpected error ocurred while trying to create user on the DB', error);
         return res.status(500).send('Could not create user');
     }
+})
+
+router.get('/me', authMiddleware, async(req, res) =>{
+    const user = await User.findById(req.user._id)
+    if (!user) return res.status(404).status('User not found');
+
+    return res.send(_.pick(user, ['_id', 'name', 'email']))
 })
 
 module.exports = router;

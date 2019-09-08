@@ -1,11 +1,12 @@
 const express = require('express');
 const { Movie, validate } = require('../models/movies');
 const { Genre } = require('../models/genres');
+const authMiddleware = require('../middleware/auth');
 const debug = require('debug')('app:movies');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -37,7 +38,7 @@ router.get('/:id', async (req, res) => {
     res.send(movie);
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     const { error } = validate(req.body)
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -59,7 +60,7 @@ router.put('/:id', async (req, res) => {
     res.send(movie);
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     const movie = await Movie.findByIdAndDelete(req.params.id);
     if (!movie) return res.status(400).send(`Could not find a movie with ID ${req.params.id}`)
     res.send(movie);

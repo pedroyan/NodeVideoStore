@@ -9,14 +9,14 @@ const config = require('config');
 // Login: POST /api/logins
 
 const userSchema = new mongoose.Schema({
-    name:{
+    name: {
         type: String,
         minlength: 5,
         maxlength: 255,
         required: true,
         trim: true
     },
-    email:{
+    email: {
         type: String,
         minlength: 5,
         maxlength: 255,
@@ -24,16 +24,19 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    password:{
+    password: {
         type: String,
         minlength: 5,
         maxlength: 255,
         required: true
+    },
+    isAdmin: {
+        type: Boolean
     }
 });
 
-userSchema.methods.generateAuthToken = function(){
-    return jwt.sign({_id: this._id}, config.get('jwtPrivateKey'))
+userSchema.methods.generateAuthToken = function () {
+    return jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, config.get('jwtPrivateKey'))
 }
 
 const User = mongoose.model('User', userSchema);
@@ -44,7 +47,7 @@ const userJoiSchema = {
     password: Joi.string().min(5).max(255).required(),
 };
 
-function validate(user){
+function validate(user) {
     return Joi.validate(user, userJoiSchema);
 }
 

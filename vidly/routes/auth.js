@@ -5,7 +5,6 @@ const _ = require('lodash');
 const router = express.Router();
 const { User } = require('../models/user');
 const debug = require('debug')('app:auth');
-const config = require('config');
 
 router.post('/', async (req, res) => {
     const { error } = validate(req.body);
