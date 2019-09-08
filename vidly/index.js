@@ -16,6 +16,13 @@ winston.add(new winston.transports.MongoDB({
     level: 'error'
 }));
 
+process.on('uncaughtException', ex => {
+    debug('We have a uncaught exception boys!', ex);
+    winston.error(ex.message, {metadata: ex});
+})
+
+throw new Error('Exception happened :(');
+
 //Routes
 const genres = require('./routes/genres');
 const customers = require('./routes/customers');
