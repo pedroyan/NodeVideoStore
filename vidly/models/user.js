@@ -10,6 +10,7 @@ const User = mongoose.model('User', new mongoose.Schema({
         type: String,
         minlength: 5,
         maxlength: 255,
+        required: true,
         trim: true
     },
     email:{
@@ -17,12 +18,14 @@ const User = mongoose.model('User', new mongoose.Schema({
         minlength: 5,
         maxlength: 255,
         unique: true,
+        required: true,
         trim: true
     },
     password:{
         type: String,
         minlength: 5,
         maxlength: 255,
+        required: true
     }
 }));
 
