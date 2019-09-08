@@ -16,12 +16,20 @@ winston.add(new winston.transports.MongoDB({
     level: 'error'
 }));
 
+//Only works in sychronous code
 process.on('uncaughtException', ex => {
-    debug('We have a uncaught exception boys!', ex);
     winston.error(ex.message, {metadata: ex});
+    process.exit(1);
 })
 
-throw new Error('Exception happened :(');
+//Only works in async code (aka promises)
+process.on('unhandledRejection', ex => {
+    winston.error(ex.message, {metadata: ex});
+    process.exit(1);
+})
+
+// var p = Promise.reject(new Error('An error ocurred on this promise'));
+// p.then(() => console.log('DONE'));
 
 //Routes
 const genres = require('./routes/genres');
