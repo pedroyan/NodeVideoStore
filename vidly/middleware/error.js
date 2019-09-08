@@ -1,6 +1,6 @@
-const debug = require('debug')('app:errors');
+const winston = require('winston');
 
-module.exports = function (err, req, res, next){
+module.exports = function (err, req, res, next) {
     res.status(500).send('Something failed')
-    debug('Failed to process request', err);
+    winston.error(err.message, {metadata: err});
 }

@@ -1,4 +1,6 @@
 require('express-async-errors');
+const winston = require('winston');
+require('winston-mongodb');
 const Joi = require('joi');
 const config = require('config');
 Joi.objectId = require('joi-objectid')(Joi);
@@ -6,6 +8,13 @@ const express = require('express');
 const debug = require('debug')('app:startup');
 const mongoose = require('mongoose');
 const error = require('./middleware/error');
+
+const connectionString = 'mongodb://localhost/vidly';
+winston.add(new winston.transports.File({filename: 'logfile.log'}));
+winston.add(new winston.transports.MongoDB({
+    db: connectionString,
+    level: 'error'
+}));
 
 //Routes
 const genres = require('./routes/genres');
@@ -20,7 +29,7 @@ if (!config.get('jwtPrivateKey')) {
     process.exit(1);
 }
 
-mongoose.connect('mongodb://localhost/vidly', { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true})
+mongoose.connect(connectionString, { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true})
     .then(() => debug('Connected to the database...'))
     .catch(err => debug('Could not connect to db', err));
 

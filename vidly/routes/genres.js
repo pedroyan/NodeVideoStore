@@ -8,6 +8,7 @@ const router = express.Router();
 
 //Get all genres
 router.get('/', async (req, res) => {
+    throw Error('LMAO');
     res.send(await Genre.find().sort('name'));
 });
 
