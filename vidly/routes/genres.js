@@ -1,6 +1,7 @@
 const express = require('express');
 const {Genre, validate} = require('../models/genres');
 const debug = require('debug')('app:genres');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -22,10 +23,10 @@ router.get('/:id', async (req, res) => {
 });
 
 //Create a Genre
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware ,async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
-    
+
     const newGenre = new Genre({
         name: req.body.name
     });
