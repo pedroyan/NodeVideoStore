@@ -1,3 +1,4 @@
+require('express-async-errors');
 const Joi = require('joi');
 const config = require('config');
 Joi.objectId = require('joi-objectid')(Joi);

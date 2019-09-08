@@ -1,4 +1,3 @@
-const asyncMiddleware = require('../middleware/async');
 const express = require('express');
 const {Genre, validate} = require('../models/genres');
 const debug = require('debug')('app:genres');
@@ -8,10 +7,9 @@ const admin = require('../middleware/admin')
 const router = express.Router();
 
 //Get all genres
-router.get('/', asyncMiddleware(async (req, res) => {
-    throw new Error('lol');
+router.get('/', async (req, res) => {
     res.send(await Genre.find().sort('name'));
-}));
+});
 
 //Get specific genre
 router.get('/:id', async (req, res) => {
@@ -32,12 +30,12 @@ router.post('/', auth, async (req, res) => {
 
     try {
         await newGenre.validate();
-        const result = await newGenre.save();
-        res.send(result);
     } catch (err) {
-        debug('Failed to create new genre in the database', err);
         res.send(err.errors[0].message);
     }
+
+    const result = await newGenre.save();
+    res.send(result);
 });
 
 //Update a Genre
