@@ -1,4 +1,5 @@
 const express = require('express');
+const _ = require('lodash');
 const router = express.Router();
 const { User, validate } = require('../models/user');
 const debug = require('debug')('app:users');
@@ -17,15 +18,13 @@ router.post('/', async (req, res) => {
     let user = await User.findOne({email: req.body.email});
     if (user) return res.status(400).send('User already registered');
 
-    user = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password // I KNOW! This is a crime. We need to hash the password before saving it to the DB, but for the sake of following the course structure I will save it unhashed
-    });
-
+    // I KNOW! This is a crime. We need to hash the password before saving it to the DB, but for the sake of following the course structure I will save it unhashed
+    user = new User(_.pick(req.body, ['name', 'email', 'password']));
     try{
         await user.save();
-        return res.send(user);
+
+        //Builds a new model containing only the name and email property
+        return res.send(_.pick(user, ['_id','name', 'email']));
     }catch(error){
         debug('An unexpected error ocurred while trying to create user on the DB', error);
         return res.status(500).send('Could not create user');
