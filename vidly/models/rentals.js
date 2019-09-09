@@ -61,14 +61,15 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
     }
 }));
 
-const rentalJoiSchema = {
-    customerId: Joi.objectId().required(),
-    movieId: Joi.objectId().required(), //ID to genre
-    returnDate: Joi.date().required(),
-    rentalDate: Joi.date()
-};
 
 function validate(rentalRequest){
+    const rentalJoiSchema = {
+        customerId: Joi.objectId().required(),
+        movieId: Joi.objectId().required(), //ID to genre
+        returnDate: Joi.date().required(),
+        rentalDate: Joi.date()
+    };
+    
     return Joi.validate(rentalRequest, rentalJoiSchema);
 }
 
