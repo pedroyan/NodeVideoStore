@@ -57,6 +57,9 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
             },
             message: 'The return date must come after the rental date'
         }
+    },
+    rentalFee:{
+        type: Number
     }
 }));
 

@@ -6,6 +6,7 @@ const Fawn = require('fawn');
 const debug = require('debug')('app:rentals');
 const authMiddleware = require('../middleware/auth');
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 
 const router = express.Router();
@@ -21,10 +22,19 @@ router.post('/', auth, async (req, res) => {
         return res.status(400).send('Rental already processed');
     }
 
+    const currentMoment = moment();
+    const rentalFee = currentMoment.diff(rental.rentalDate, 'days') * rental.movie.dailyRentalRate;
+
+    console.log('Resulting fee', rentalFee);
+
     await new Fawn.Task()
-        .update('rentals', { _id: rental._id }, { $set: { returnDate: Date.now() } })
-        .update('movies', { _id:  mongoose.Types.ObjectId(req.body.movieId)}, { 
-            $inc: { numberInStock: 1 } 
+        .update('rentals', { _id: rental._id }, {
+            $set: {
+                returnDate: Date.now(),
+                rentalFee: rentalFee
+            }
+        }).update('movies', { _id: mongoose.Types.ObjectId(req.body.movieId) }, {
+            $inc: { numberInStock: 1 }
         }).run();
 
     res.send(200);

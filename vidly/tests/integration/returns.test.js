@@ -1,3 +1,4 @@
+const moment = require('moment');
 const { Movie } = require('../../models/movies');
 const { Rental } = require('../../models/rentals');
 const mongoose = require('mongoose');
@@ -126,16 +127,27 @@ describe('/api/returns', () => {
     });
 
     it('should normally process the return', async () => {
+        const daysAgo = 7;
+        rental.rentalDate = moment().subtract(daysAgo, 'days').toDate();
+        await rental.save();
+
         const res = await exec();
         
+        const rentalInDb = await Rental.findById(rental._id);
+        const movieInDb = await Movie.findById(movieId);
+        const msDif = new Date() - rentalInDb.returnDate;
+        
+        //Status must be 200
         expect(res.status).toBe(200);
 
-        const rentalInDb = await Rental.findById(rental._id);
-        const msDif = new Date() - rentalInDb.returnDate;
+        //The return date must be valid and not far from the current date
         expect(msDif).toBeLessThan(10*1000);
 
-        const movieInDb = await Movie.findById(movieId);
-        expect(movieInDb.numberInStock).toBe(movie.numberInStock + 1)
+        //The stock number of the movie returned must be increase
+        expect(movieInDb.numberInStock).toBe(movie.numberInStock + 1);
+
+        //The fee should be calculated correclty
+        expect(rentalInDb.rentalFee).toBe(daysAgo*rental.movie.dailyRentalRate);
     });
 
     //Return 400 if rental already processed
