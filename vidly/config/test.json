@@ -1,3 +1,4 @@
 {
-    "jwtPrivateKey": "123"
+    "jwtPrivateKey": "123",
+    "connectionString": "mongodb://localhost/vidly_test"
 }

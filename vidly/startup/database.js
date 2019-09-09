@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const config = require('config');
-const connectionString = 'mongodb://localhost/vidly';
 const debug = require('debug')('app:startup');
 
 module.exports = function () {
-    mongoose.connect(connectionString, { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true })
-        .then(() => debug('Connected to the database...'))
+    const cs = config.get('connectionString');
+    mongoose.connect(cs, { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true })
+        .then(() => debug(`Connected to the database ${cs}...`))
         .catch(err => debug('Could not connect to db', err));
 }
