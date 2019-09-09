@@ -95,7 +95,7 @@ describe('notifyCustomer', () => {
 
         expect(mail.send).toHaveBeenCalled();
         expect(mail.send.mock.calls[0][0]).toBe('a'); //In the first call to the function, the first argument must be a
-        expect(mail.send.mock.calls[0][1]).toMatch(/order/); //In the first call to the function, the first argument must be a
+        expect(mail.send.mock.calls[0][1]).toMatch(/order/); //In the first call to the function, the second argument must match the rgex
 
     });
 })
