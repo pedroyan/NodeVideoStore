@@ -27,7 +27,7 @@ router.post('/', auth, async (req, res) => {
 
     console.log('Resulting fee', rentalFee);
 
-    await new Fawn.Task()
+    const taskResults = await new Fawn.Task()
         .update('rentals', { _id: rental._id }, {
             $set: {
                 returnDate: Date.now(),
@@ -37,7 +37,9 @@ router.post('/', auth, async (req, res) => {
             $inc: { numberInStock: 1 }
         }).run();
 
-    res.send(200);
+    
+    const refreshedRental = await Rental.findById(rental._id);
+    res.status(200).send(refreshedRental);
 });
 
 module.exports = router;
