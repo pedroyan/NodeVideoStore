@@ -1,5 +1,6 @@
 const request = require('supertest');
 const { Genre } = require('../../models/genres');
+const {User} = require('../../models/user');
 const mongoose = require('mongoose');
 let server;
 
@@ -7,6 +8,7 @@ describe('/api/genres', () => {
     beforeEach(() => { server = require('../../index'); })
     afterEach(async () => {
         await Genre.deleteMany({});
+        await User.deleteMany({});
         server.close();
     });
     describe('GET /', () => {
@@ -51,6 +53,50 @@ describe('/api/genres', () => {
                 .send({ name: 'Genre 1' });
 
             expect(res.status).toBe(401);
+        });
+
+        it('should return 400 if the created genre has less than 3 characters', async () => {
+            const user = new User({
+                name: 'Pedro',
+                email: 'pedro@pedro.com',
+                password: 'somethingthatdoesntmatter'
+            });
+
+            await user.save();
+            const token = user.generateAuthToken();
+
+            const res = await request(server)
+                .post(`/api/genres`)
+                .set('x-auth-token', token)
+                .send({ name: '12' });
+
+            expect(res.status).toBe(400);
+        });
+
+        it('should return 200 and save new genre to the DB', async () => {
+            const user = new User({
+                name: 'Pedro',
+                email: 'pedro@pedro.com',
+                password: 'somethingthatdoesntmatter'
+            });
+
+            await user.save();
+            const token = user.generateAuthToken();
+
+            const genreName = 'New Genre Name';
+            const res = await request(server)
+                .post(`/api/genres`)
+                .set('x-auth-token', token)
+                .send({ name: genreName });
+
+            expect(res.status).toBe(200);
+
+            const genre = await Genre.findOne({name: genreName});
+            expect(genre).toBeDefined();
+
+            expect(res.body).toMatchObject({name: genreName});
+            expect(res.body).toHaveProperty('_id');
+
         });
     })
 })
