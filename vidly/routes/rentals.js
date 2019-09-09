@@ -32,7 +32,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
         //In this project, we will be using an NPM package that abstracts this two phase
         //commit to something akin to a transaxtion, as shown below.
-        new Fawn.Task()
+        await new Fawn.Task()
         .save('rentals', rental)
         .update('movies', {_id: movie._id}, {
             $inc: {numberInStock: -1}

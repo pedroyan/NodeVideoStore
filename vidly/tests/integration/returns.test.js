@@ -71,6 +71,7 @@ describe('/api/returns', () => {
 
     afterEach(async () => {
         await Rental.deleteMany({});
+        await Movie.deleteMany({});
         //server.close();
     });
 
@@ -129,7 +130,12 @@ describe('/api/returns', () => {
         
         expect(res.status).toBe(200);
 
-        //TODO: Query the db
+        const rentalInDb = await Rental.findById(rental._id);
+        const msDif = new Date() - rentalInDb.returnDate;
+        expect(msDif).toBeLessThan(10*1000);
+
+        const movieInDb = await Movie.findById(movieId);
+        expect(movieInDb.numberInStock).toBe(movie.numberInStock + 1)
     });
 
     //Return 400 if rental already processed
