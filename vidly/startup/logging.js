@@ -5,7 +5,7 @@ require('express-async-errors');
 
 winston.format = winston.format.json();
 winston.add(new winston.transports.File({ filename: 'logfile.log' }));
-winston.add(new winston.transports.Console()); //TODO: Properly configure the console outuput (https://github.com/winstonjs/winston)
+//winston.add(new winston.transports.Console()); //TODO: Properly configure the console outuput (https://github.com/winstonjs/winston)
 // winston.add(new winston.transports.MongoDB({
 //     db: config.get('connectionString'),
 //     level: 'error'

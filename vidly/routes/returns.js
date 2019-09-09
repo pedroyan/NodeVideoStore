@@ -18,17 +18,11 @@ router.post('/', [auth, validateMiddleware(validate)], async (req, res) => {
         return res.status(400).send('Rental already processed');
     }
 
-    const currentMoment = moment();
-    const rentalFee = currentMoment.diff(rental.rentalDate, 'days') * rental.movie.dailyRentalRate;
-
-    console.log('Resulting fee', rentalFee);
+    rental.return();
 
     const taskResults = await new Fawn.Task()
         .update('rentals', { _id: rental._id }, {
-            $set: {
-                returnDate: Date.now(),
-                rentalFee: rentalFee
-            }
+            $set: rental
         }).update('movies', { _id: mongoose.Types.ObjectId(req.body.movieId) }, {
             $inc: { numberInStock: 1 }
         }).run();

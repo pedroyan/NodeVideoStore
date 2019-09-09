@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
+const moment = require('moment');
 
 const rentalSchema = new mongoose.Schema({
     //Why I didn't copy the customer schema directly from the customer module?
@@ -69,6 +70,16 @@ rentalSchema.statics.lookup = function(customerId, movieId){
         'movie._id': movieId 
     });
 }
+
+rentalSchema.methods.return = function(){
+    const currentMoment = moment();
+    const nOfDaysRented = currentMoment.diff(this.rentalDate, 'days') ;
+    const rentalFee = nOfDaysRented * this.movie.dailyRentalRate;
+
+    this.rentalFee = rentalFee;
+    this.returnDate = currentMoment.toDate();
+}
+
 const Rental = mongoose.model('Rental', rentalSchema);
 
 
