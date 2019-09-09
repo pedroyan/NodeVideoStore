@@ -3,6 +3,8 @@ const {Genre, validate} = require('../models/genres');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin')
 const validateObjectId = require('../middleware/validateObjectId');
+const winston = require('winston');
+const debug = require('debug')('app:genres');
 
 const router = express.Router();
 
@@ -28,12 +30,6 @@ router.post('/', auth, async (req, res) => {
         name: req.body.name
     });
 
-    try {
-        await newGenre.validate();
-    } catch (err) {
-        res.send(err.errors[0].message);
-    }
-
     const result = await newGenre.save();
     res.send(result);
 });
@@ -41,8 +37,11 @@ router.post('/', auth, async (req, res) => {
 //Update a Genre
 router.put('/:id', [auth, validateObjectId], async (req, res) => {
     const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
+    if (error){
+        debug('Genre update denied due to validation errors', error);
+        return res.status(400).send(error.details[0].message);
+    } 
+    
     const genre = await Genre.findByIdAndUpdate(req.params.id, {
         $set: {
             name: req.body.name

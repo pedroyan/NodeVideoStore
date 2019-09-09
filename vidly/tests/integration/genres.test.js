@@ -105,5 +105,115 @@ describe('/api/genres', () => {
             expect(res.body).toHaveProperty('_id');
 
         });
+    });
+
+    describe('PUT /', () => {
+        let genreName = '';
+        let token = '';
+        let genreId = '';
+
+        beforeEach(async () => {
+            const genre = new Genre({name: 'Existing Genre'});
+            await genre.save();
+            genreId = genre._id.toHexString();
+
+            token = new User({
+                name: 'Pedro',
+                email: 'pedro@pedro.com',
+                password: 'somethingthatdoesntmatter',
+                isAdmin: true
+            }).generateAuthToken();
+
+            genreName = 'New Genre Name';
+        });
+
+        const exec = async () => {
+            return await request(server)
+                .put(`/api/genres/${genreId}`)
+                .set('x-auth-token', token)
+                .send({ name: genreName });
+        };
+
+        it('should return 400 if request body is invalid', async () => {
+            genreName = '12';
+
+            const res = await exec();
+
+            expect(res.status).toBe(400);
+        });
+
+        it('should return 404 if the genre id is invalid', async () => {
+            genreId = '1';
+            
+            const res = await exec();
+
+            expect(res.status).toBe(404);
+        });
+
+        it('should return 404 if a nonexistent id is passed', async () => {
+            genreId = new mongoose.Types.ObjectId().toHexString();
+            
+            const res = await exec();
+
+            expect(res.status).toBe(404);
+        });
+        
+        it('should return 200 if the genre is updated with a valid payload', async () => {
+            const res = await exec();
+
+            expect(res.status).toBe(200);
+            expect(res.body).toMatchObject({name: genreName, _id: genreId});
+        });
+    })
+
+    describe('delete /', () => {
+        let token = '';
+        let genreId = '';
+
+        beforeEach(async () => {
+            const genre = new Genre({name: 'Existing Genre'});
+            await genre.save();
+            genreId = genre._id.toHexString();
+
+            token = new User({
+                name: 'Pedro',
+                email: 'pedro@pedro.com',
+                password: 'somethingthatdoesntmatter',
+                isAdmin: true
+            }).generateAuthToken();
+        });
+
+        const exec = async () => {
+            return await request(server)
+                .delete(`/api/genres/${genreId}`)
+                .set('x-auth-token', token)
+                .send({ name: 'New Genre Name' });
+        };
+
+        it('should return 404 if the genre id is invalid', async () => {
+            genreId = '1';
+            
+            const res = await exec();
+
+            expect(res.status).toBe(404);
+        });
+
+        it('should return 404 if a nonexistent id is passed', async () => {
+            genreId = new mongoose.Types.ObjectId().toHexString();
+            
+            const res = await exec();
+
+            expect(res.status).toBe(404);
+        });
+        
+        it('should return 200 if the genre is deleted', async () => {
+            const res = await exec();
+
+            expect(res.status).toBe(200);
+            expect(res.body._id).toBe(genreId);
+
+            const deleted = await Genre.findById(genreId);
+            expect(deleted).toBeFalsy();
+        });
     })
 })
