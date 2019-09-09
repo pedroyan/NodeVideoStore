@@ -1,5 +1,8 @@
+const { Movie } = require('../../models/movies');
 const { Rental } = require('../../models/rentals');
 const mongoose = require('mongoose');
+const { User } = require('../../models/user');
+const request = require('supertest');
 
 //POST /api/returns {customerId, movieId}
 
@@ -17,14 +20,34 @@ const mongoose = require('mongoose');
 
 describe('/api/returns', () => {
     let server;
-    let customerId = '';
+    let customerId;
     let movieId;
     let rental;
+    let token;
 
     beforeEach(async () => {
         server = require('../../index');
-        customerId = mongoose.Types.ObjectId();
-        movieId = mongoose.Types.ObjectId();
+
+        token = new User({
+            name: 'Pedro',
+            email: 'pedro@pedro.com',
+            password: 'somethingthatdoesntmatter',
+            isAdmin: true
+        }).generateAuthToken();
+        customerId = mongoose.Types.ObjectId().toHexString();
+        
+        let dailyRentalRate = 2;
+        movie = new Movie({
+            title: 'The legend of the bugless code',
+            genre: {
+                _id: mongoose.Types.ObjectId(),
+                name: 'Some Genre'
+            },
+            dailyRentalRate: dailyRentalRate,
+            numberInStock: 1
+        });
+
+        movieId = movie._id.toHexString();
 
         rental = new Rental({
             customer: {
@@ -35,11 +58,15 @@ describe('/api/returns', () => {
             movie: {
                 _id: movieId,
                 title: 'Movie title',
-                dailyRentalRate: 2
+                dailyRentalRate: dailyRentalRate
             },
         });
 
-        await rental.save();
+        const p1 = rental.save();
+        const p2 = movie.save();
+
+        await Promise.all([p1, p2]);
+
     });
 
     afterEach(async () => {
@@ -47,9 +74,63 @@ describe('/api/returns', () => {
         //server.close();
     });
 
-    it('should work', async () => {
-        const rental = await Rental.findById(rental._id);
-        console.log(rental);
-        expect(rental).not.toBeNull();
+    const exec = () => {
+        return request(server)
+            .post(`/api/returns/`)
+            .set('x-auth-token', token)
+            .send({ customerId, movieId });
+    };
+
+    it('should return 401 if client is not logged in', async () => {
+        token = '';
+
+        const res = await exec();
+
+        expect(res.status).toBe(401);
     });
-})
+
+    it('should return 400 if customerId is not provided', async () => {
+        customerId = undefined;
+
+        const res = await exec();
+
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if movieId is not provided', async () => {
+        movieId = undefined;
+
+        const res = await exec();
+
+        expect(res.status).toBe(400);
+    });
+    
+    it('should return 404 if no valid rental could be found for the provided ids', async () => {
+        movieId = mongoose.Types.ObjectId().toHexString();
+
+        const res = await exec();
+
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if rental already processed', async () => {
+        const updatedRental = await Rental.findByIdAndUpdate(rental._id,
+             {$set: {
+                 returnDate: Date.now()
+             }}, {new: true});
+
+        const res = await exec();
+
+        expect(res.status).toBe(400);
+    });
+
+    it('should normally process the return', async () => {
+        const res = await exec();
+        
+        expect(res.status).toBe(200);
+
+        //TODO: Query the db
+    });
+
+    //Return 400 if rental already processed
+});

@@ -51,7 +51,6 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
     },
     returnDate:{
         type: Date,
-        required: true,
         validate:{
             validator:  function(v){
                 return v > this.rentalDate;
@@ -66,8 +65,6 @@ function validate(rentalRequest){
     const rentalJoiSchema = {
         customerId: Joi.objectId().required(),
         movieId: Joi.objectId().required(), //ID to genre
-        returnDate: Joi.date().required(),
-        rentalDate: Joi.date()
     };
     
     return Joi.validate(rentalRequest, rentalJoiSchema);
