@@ -1,13 +1,9 @@
 const express = require('express');
-const { Rental, validate } = require('../models/rentals');
+const { Rental, validateRental: validate } = require('../models/rentals');
 const { Customer } = require('../models/customers');
 const { Movie } = require('../models/movies');
-const mongoose = require('mongoose');
-const Fawn = require('fawn');
 const debug = require('debug')('app:rentals');
 const authMiddleware = require('../middleware/auth');
-
-Fawn.init(mongoose);
 
 const router = express.Router();
 

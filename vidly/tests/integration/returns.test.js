@@ -110,7 +110,7 @@ describe('/api/returns', () => {
 
         const res = await exec();
 
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(404);
     });
 
     it('should return 400 if rental already processed', async () => {
