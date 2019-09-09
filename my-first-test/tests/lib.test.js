@@ -1,6 +1,7 @@
 //docs on: https://jestjs.io/docs/en/getting-started
 const lib = require('../lib');
 const db = require('../db');
+const mail = require('../mail');
 
 describe('absolute', () => { //Used for grouping tests
 
@@ -81,5 +82,26 @@ describe('applyDiscount', () => {
         }
         lib.applyDiscount(order);
         expect(order.totalPrice).toBe(9);
+    });
+})
+
+describe('notifyCustomer', () => {
+    it('should send an email to the customer', () => {
+        db.getCustomerSync = function(customerId){
+            console.log('Fake reading customer...');
+            return { id: customerId, email: 'a'};
+        }
+
+        let mailSent = false;
+        let mailRecipient = '';
+        mail.send = function(to, subject){
+            mailSent = true;
+            mailRecipient = to;
+        };
+
+        lib.notifyCustomer({customerId: 1})
+
+        expect(mailSent).toBe(true);
+        expect(mailRecipient).toBe('a');
     });
 })
