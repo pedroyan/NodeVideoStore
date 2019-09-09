@@ -28,8 +28,13 @@ describe('/api/genres', () => {
             expect(res.body.some(g => g.name === 'genre3'));
         });
 
-        it('should return 404 when a nonexistent id is entered', async () => {
+        it('should return 404 when a nonexistent invalid id is entered', async () => {
             const res = await request(server).get(`/api/genres/1`);
+            expect(res.status).toBe(404);
+        });
+
+        it('should return 404 when a nonexistent valid id is entered', async () => {
+            const res = await request(server).get(`/api/genres/${new mongoose.Types.ObjectId().toHexString()}`);
             expect(res.status).toBe(404);
         });
 

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand --verbose"
+    "test": "jest --runInBand --verbose --coverage"
   },
   "keywords": [],
   "author": "",
