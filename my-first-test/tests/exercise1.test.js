@@ -2,7 +2,11 @@ const exercise1 = require('../exercise1');
 
 describe('fizzBuzz', () => {
     it('should throw when input is not a number', () => {
-        expect(() => {exercise1.fizzBuzz('Hello')}).toThrow();
+        //VERY important on code interviews to test all kinds of "not-numbery" inputs
+        const inputs = ['hello', undefined, null, {oi: 'ola'}]
+        inputs.forEach(a =>{
+            expect(() => {exercise1.fizzBuzz(a)}).toThrow();
+        })
     });
 
     it('should return fizzbuzz when number can be divided by 3 and 5', () => {
