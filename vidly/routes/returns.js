@@ -11,7 +11,7 @@ const validateMiddleware = require('../middleware/validateMiddleware');
 const router = express.Router();
 
 router.post('/', [auth, validateMiddleware(validate)], async (req, res) => {
-    const rental = await Rental.findOne({ 'customer._id': req.body.customerId, 'movie._id': req.body.movieId });
+    const rental = await Rental.lookup(req.body.customerId, req.body.movieId)
     if (!rental) return res.status(404).send('Could not find provided rental');
 
     if (rental.returnDate) {

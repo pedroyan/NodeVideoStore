@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 
-const Rental = mongoose.model('Rental', new mongoose.Schema({
+const rentalSchema = new mongoose.Schema({
     //Why I didn't copy the customer schema directly from the customer module?
     //Because on a real world application, this is the only information about a
     //customer that matters to the Rental. By doing it like this, we garantee
@@ -61,7 +61,15 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
     rentalFee:{
         type: Number
     }
-}));
+});
+
+rentalSchema.statics.lookup = function(customerId, movieId){
+    return this.findOne({
+        'customer._id': customerId, 
+        'movie._id': movieId 
+    });
+}
+const Rental = mongoose.model('Rental', rentalSchema);
 
 
 function validate(rentalRequest){
