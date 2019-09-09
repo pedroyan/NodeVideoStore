@@ -29,7 +29,7 @@ router.post('/', [auth, validateMiddleware(validate)], async (req, res) => {
 
     
     const refreshedRental = await Rental.findById(rental._id);
-    res.status(200).send(refreshedRental);
+    res.send(refreshedRental);
 });
 
 module.exports = router;

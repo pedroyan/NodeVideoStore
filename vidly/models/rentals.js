@@ -73,6 +73,7 @@ rentalSchema.statics.lookup = function(customerId, movieId){
 
 rentalSchema.methods.return = function(){
     const currentMoment = moment();
+    
     const nOfDaysRented = currentMoment.diff(this.rentalDate, 'days') ;
     const rentalFee = nOfDaysRented * this.movie.dailyRentalRate;
 
