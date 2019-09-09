@@ -149,11 +149,17 @@ describe('/api/returns', () => {
         //The fee should be calculated correclty
         expect(rentalInDb.rentalFee).toBe(daysAgo*rental.movie.dailyRentalRate);
 
-        expect(res.body).toHaveProperty('customer');
-        expect(res.body).toHaveProperty('movie');
-        expect(res.body).toHaveProperty('rentalDate');
-        expect(res.body).toHaveProperty('returnDate');
-        expect(res.body).toHaveProperty('rentalFee');
+        // expect(res.body).toHaveProperty('customer');
+        // expect(res.body).toHaveProperty('movie');
+        // expect(res.body).toHaveProperty('rentalDate');
+        // expect(res.body).toHaveProperty('returnDate');
+        // expect(res.body).toHaveProperty('rentalFee');
+
+
+        //Better way to do the same as the above
+        expect(Object.keys(res.body))
+            .toEqual(expect.arrayContaining(['customer','movie',
+            'rentalDate','returnDate','rentalFee']));
 
     });
 
