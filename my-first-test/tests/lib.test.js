@@ -1,5 +1,6 @@
 //docs on: https://jestjs.io/docs/en/getting-started
 const lib = require('../lib');
+const db = require('../db');
 
 describe('absolute', () => { //Used for grouping tests
 
@@ -69,3 +70,16 @@ describe('registerUser', () => {
         expect(user.id).toBeGreaterThan(0);
     });
 });
+
+describe('applyDiscount', () => {
+    it('should apply 10% discount if customer has more than 10 points', () => {
+        const order = {customerId: 1, totalPrice: 10};
+
+        db.getCustomerSync = function(customerId){
+            console.log('Fake reading customer...');
+            return { id: customerId, points: 20};
+        }
+        lib.applyDiscount(order);
+        expect(order.totalPrice).toBe(9);
+    });
+})
