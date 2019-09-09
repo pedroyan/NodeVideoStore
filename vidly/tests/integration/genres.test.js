@@ -9,7 +9,7 @@ describe('/api/genres', () => {
     afterEach(async () => {
         await Genre.deleteMany({});
         await User.deleteMany({});
-        server.close();
+        //server.close();
     });
 
     describe('GET /', () => {
@@ -48,6 +48,10 @@ describe('/api/genres', () => {
     });
 
     describe('POST /', () => {
+
+        //Interesting testing guidelines to avoid repetition:
+        //Define the happy path, and then in each test, we change one
+        //parameter that clearly aligns with the name of the test.
         let genreName = '';
         let token = '';
 

@@ -9,8 +9,11 @@ require('./startup/database')();
 require('./startup/routes')(app);
 
 const port = process.env.NODEPORT || 7345;
-const server = app.listen(port, () => {
-    winston.info(`App listening on por ${port}`);
-});
 
-module.exports = server;
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(port, () => {
+        winston.info(`App listening on por ${port}`);
+    });
+}
+
+module.exports = app;
