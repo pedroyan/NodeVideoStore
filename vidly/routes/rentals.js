@@ -25,24 +25,19 @@ router.post('/', authMiddleware, async (req, res) => {
         returnDate: req.body.returnDate
     });
 
-    try {
-        //In MongoDB, there is no such thing as a Transaction, like in SQL.
-        //But there is a concept called two phase commit:
-        //https://docs.mongodb.com/v3.4/tutorial/perform-two-phase-commits/
+    //In MongoDB, there is no such thing as a Transaction, like in SQL.
+    //But there is a concept called two phase commit:
+    //https://docs.mongodb.com/v3.4/tutorial/perform-two-phase-commits/
 
-        //In this project, we will be using an NPM package that abstracts this two phase
-        //commit to something akin to a transaxtion, as shown below.
-        await new Fawn.Task()
-        .save('rentals', rental)
-        .update('movies', {_id: movie._id}, {
-            $inc: {numberInStock: -1}
-        }).run();
+    //In this project, we will be using an NPM package that abstracts this two phase
+    //commit into something akin to a transaction, as shown below.
+    await new Fawn.Task()
+    .save('rentals', rental)
+    .update('movies', {_id: movie._id}, {
+        $inc: {numberInStock: -1}
+    }).run();
 
-        res.send(rental);
-    } catch (err) {
-        debug('An unexpected error occurred while creating a rental', err);
-        res.status(500).send('Something Failed');
-    }
+    res.send(rental);
 })
 
 router.get('/', async (req, res) => {
