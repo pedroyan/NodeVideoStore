@@ -5,6 +5,8 @@ const router = express.Router();
 const { User, validate } = require('../models/user');
 const debug = require('debug')('app:users');
 const authMiddleware = require('../middleware/auth');
+const validateMiddleware = require('../middleware/validateMiddleware');
+
 
 // Authentication
 // Authorization
@@ -12,10 +14,7 @@ const authMiddleware = require('../middleware/auth');
 // Register: POST /api/user {name, email, password}. Email must be unique -> { email: {type: String, unique:true}}
 // Login: POST /api/logins
 
-router.post('/',  authMiddleware, async (req, res) => {
-    const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
+router.post('/',  validateMiddleware(validate), async (req, res) => {
     let user = await User.findOne({ email: req.body.email });
     if (user) return res.status(400).send('User already registered');
 
@@ -35,7 +34,7 @@ router.post('/',  authMiddleware, async (req, res) => {
 
 router.get('/me', authMiddleware, async(req, res) =>{
     const user = await User.findById(req.user._id)
-    if (!user) return res.status(404).status('User not found');
+    if (!user) return res.status(404).send('User not found');
 
     return res.send(_.pick(user, ['_id', 'name', 'email']))
 })

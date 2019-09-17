@@ -1,52 +1,82 @@
+const bcrypt = require('bcrypt');
 const { User } = require('../../models/user');
-const { Genre } = require('../../models/genres');
 const request = require('supertest');
 let server;
 
-describe('auth middleware', () => {
-    let token = '';
-
+describe('/api/auth', () => {
     beforeEach(() => { 
         server = require('../../index');
-        token = new User({
-            name: 'Pedro',
-            email: 'pedro@pedro.com',
-            password: 'somethingthatdoesntmatter'
-        }).generateAuthToken();
-     })
-    afterEach(async () => { 
-        await Genre.deleteMany({});
-        //server.close();
     });
 
-    const exec = () => {
-        return request(server)
-        .post('/api/genres')
-        .set('x-auth-token', token)
-        .send({name: 'GenreName'});
-    }
+    describe('POST /' , () => {
+        let email = '';
+        let password = '';
+        let jwtToken = '';
 
-    it('should return 401 if no token is provided', async () => {
-        token = '';
+        beforeEach(async () => {
+            email = 'pedro@pedro.com',
+            password = 'PedroRocks.7392'
+            
+            const hash = await bcrypt.hash(password, await bcrypt.genSalt(10));
+            const user = new User({
+                name: 'Pedro Yan',
+                email: email,
+                password: hash
+            });
 
-        const res = await exec();
+            jwtToken = user.generateAuthToken();
 
-        expect(res.status).toBe(401);
-    });
+            await user.save();
+        });
 
-    
-    it('should return 400 if token is invalid', async () => {
-        token = 'blabla';
+        afterEach(async ()=>{
+            await User.deleteMany({});
+        })
 
-        const res = await exec();
+        const exec = () => {
+            return request(server)
+            .post('/api/auth')
+            .send({email: email, password: password});
+        }
 
-        expect(res.status).toBe(400);
-    });
+        it('Should return 400 if email is invalid',async () => {
+            email = 'wrong';
 
-    it('should return 200 if token is valid', async () => {
-        const res = await exec();
+            const res = await exec();
 
-        expect(res.status).toBe(200);
+            expect(res.status).toBe(400);
+        });
+
+        it('Should return 400 if password is invalid', async () => {
+            password = 'lol';
+
+            const res = await exec();
+
+            expect(res.status).toBe(400);
+        });
+
+        it('Should return 400 if password is valid but incorrect', async () => {
+            password = 'validpassword123';
+
+            const res = await exec();
+
+            expect(res.status).toBe(400);
+        });
+
+        it('Should return 400 if email doesnt exist', async () => {
+            email = 'theemailthatneverexisted@pedro.com';
+
+            const res = await exec();
+
+            expect(res.status).toBe(400);
+        });
+
+        it('Should return 200 if login is successful', async () => {
+            const res = await exec();
+
+            expect(res.status).toBe(200);
+            expect(res.text).toBe(jwtToken);
+        })
     });
 
 });

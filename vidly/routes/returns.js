@@ -2,9 +2,7 @@ const express = require('express');
 const auth = require('../middleware/auth');
 const { Rental, validate } = require('../models/rentals');
 const Fawn = require('fawn');
-const debug = require('debug')('app:rentals');
 const mongoose = require('mongoose');
-const moment = require('moment');
 const validateMiddleware = require('../middleware/validateMiddleware');
 
 
