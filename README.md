@@ -12,3 +12,4 @@ Features:
 - Request model validation using Joi
 - DB Schema validation with Mongoose
 - Unit testing and Integration testing with Jest
+- Logging with winston
